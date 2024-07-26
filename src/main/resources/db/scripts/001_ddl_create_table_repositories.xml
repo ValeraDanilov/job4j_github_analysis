@@ -16,6 +16,9 @@
             <column name="url" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="userName" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 

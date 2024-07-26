@@ -1,6 +1,6 @@
 package ru.job4j.github.analysis.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.github.analysis.dto.RepositoryCommits;
@@ -11,24 +11,25 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class GitHubController {
 
-    @Autowired
     private RepositoryService repositoryService;
 
     @GetMapping("/repositories")
     public List<Repository> getAllRepositories() {
-        return List.of();
+        return this.repositoryService.findAll();
     }
 
     @GetMapping("/commits/{name}")
     public List<RepositoryCommits> getCommits(@PathVariable(value = "name") String name) {
-        return List.of();
+        Repository repository = this.repositoryService.findByName(name);
+        return this.repositoryService.findCommitsByRepositoryName(repository);
     }
 
-    @PostMapping("/repository")
-    public ResponseEntity<Void> create(@RequestBody Repository repository) {
-        repositoryService.create(repository);
+    @PostMapping("/gitHub/{userName}")
+    public ResponseEntity<Void> create(@PathVariable(value = "userName") String userName) {
+        this.repositoryService.create(userName);
         return ResponseEntity.noContent().build();
     }
 }
