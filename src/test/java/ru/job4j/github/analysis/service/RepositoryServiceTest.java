@@ -6,11 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.job4j.github.analysis.dto.RepositoryCommits;
 import ru.job4j.github.analysis.model.Commit;
 import ru.job4j.github.analysis.model.Repository;
 import ru.job4j.github.analysis.repository.CommitRepository;
 import ru.job4j.github.analysis.repository.RepositoryRepository;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +40,7 @@ class RepositoryServiceTest {
         this.repository = new Repository();
         this.repository.setName("test-repo");
         this.repository.setUrl("https://github.com/user/test-repo");
-
+        this.repository.setUserName("user");
         this.commit = new Commit();
         this.commit.setMessage("Initial commit");
         this.commit.setAuthor("user");
@@ -68,10 +68,18 @@ class RepositoryServiceTest {
     @Test
     void testFindCommitsByRepositoryName() {
         when(this.commitRepository.findCommitsByRepositoryName("test-repo")).thenReturn(Collections.singletonList(this.commit));
-        List<RepositoryCommits> commits = this.repositoryService.findCommitsByRepositoryName(this.repository);
+        List<Commit> commits = this.repositoryService.findCommitsByRepositoryName("test-repo");
         assertEquals(1, commits.size());
         assertEquals("Initial commit", commits.get(0).getMessage());
         verify(this.commitRepository, times(1)).findCommitsByRepositoryName("test-repo");
+    }
+
+    @Test
+    void testFindLatestCommit() {
+        when(this.commitRepository.findTopByRepositoryOrderByDateDesc(this.repository)).thenReturn(this.commit);
+        Commit latestCommit = this.repositoryService.findLatestCommit(this.repository);
+        assertEquals("Initial commit", latestCommit.getMessage());
+        verify(this.commitRepository, times(1)).findTopByRepositoryOrderByDateDesc(this.repository);
     }
 
     @Test

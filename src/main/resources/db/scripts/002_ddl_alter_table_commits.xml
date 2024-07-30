@@ -19,6 +19,9 @@
             <column name="date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
+            <column name="sha" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="repository_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>

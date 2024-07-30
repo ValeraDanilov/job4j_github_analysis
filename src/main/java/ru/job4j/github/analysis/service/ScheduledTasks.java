@@ -19,10 +19,14 @@ public class ScheduledTasks {
     public void fetchCommits() {
         var repositories = this.repositoryService.findAll();
         for (Repository repository : repositories) {
-            List<Commit> commits = gitHubRemote.fetchCommits(repository.getUserName(), repository.getName());
-            for (Commit commit : commits) {
-                commit.setRepository(repository);
-                this.repositoryService.create(commit);
+            Commit latestCommit = this.repositoryService.findLatestCommit(repository);
+            String lastCommitSha = latestCommit != null ? latestCommit.getSha() : null;
+            List<Commit> commits = this.gitHubRemote.fetchCommits(repository.getUserName(), repository.getName(), lastCommitSha);
+            if (!commits.isEmpty()) {
+                for (Commit commit : commits) {
+                    commit.setRepository(repository);
+                    this.repositoryService.create(commit);
+                }
             }
         }
     }

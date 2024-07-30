@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.job4j.github.analysis.model.Commit;
 import ru.job4j.github.analysis.repository.CommitRepository;
 import ru.job4j.github.analysis.repository.RepositoryRepository;
-import ru.job4j.github.analysis.dto.RepositoryCommits;
 import ru.job4j.github.analysis.model.Repository;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,22 +25,12 @@ public class RepositoryService {
         return this.repository.findByName(name);
     }
 
-    public List<RepositoryCommits> findCommitsByRepositoryName(Repository repository) {
-        List<RepositoryCommits> repositoryCommits = new ArrayList<>();
-        List<Commit> commits = this.commitRepository.findCommitsByRepositoryName(repository.getName());
-        if (commits != null) {
-            for (Commit commit : commits) {
-                repositoryCommits.add(
-                        new RepositoryCommits(
-                                repository.getName(),
-                                commit.getMessage(),
-                                commit.getAuthor(),
-                                commit.getDate()
-                        )
-                );
-            }
-        }
-        return repositoryCommits;
+    public List<Commit> findCommitsByRepositoryName(String repositoryName) {
+        return this.commitRepository.findCommitsByRepositoryName(repositoryName);
+    }
+
+    public Commit findLatestCommit(Repository repository) {
+        return commitRepository.findTopByRepositoryOrderByDateDesc(repository);
     }
 
     @Async

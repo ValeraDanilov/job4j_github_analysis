@@ -22,16 +22,18 @@ public class GitHubRemote {
         ResponseEntity<List<Repository>> response = this.restTemplate.exchange(
                 url, HttpMethod.GET, null,
                 new ParameterizedTypeReference<>() {
-                });
+                }
+        );
         return response.getBody();
     }
 
-    public List<Commit> fetchCommits(String owner, String repoName) {
-        String url = String.format("https://api.github.com/repos/%s/%s/commits", owner, repoName);
-        ResponseEntity<List<Commit>> response = restTemplate.exchange(
+    public List<Commit> fetchCommits(String owner, String repoName, String sha) {
+        String url = String.format("https://api.github.com/repos/%s/%s/commits?sha=%s", owner, repoName, sha);
+        ResponseEntity<List<Commit>> response = this.restTemplate.exchange(
                 url, HttpMethod.GET, null,
                 new ParameterizedTypeReference<>() {
-                });
+                }
+        );
         return response.getBody();
     }
 }

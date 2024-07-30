@@ -15,6 +15,7 @@ public class Commit {
     private String message;
     private String author;
     private LocalDateTime date;
+    private String sha;
     @ManyToOne
     @JoinColumn(name = "repository_id")
     private Repository repository;

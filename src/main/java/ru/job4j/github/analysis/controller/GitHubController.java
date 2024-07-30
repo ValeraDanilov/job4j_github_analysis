@@ -3,7 +3,7 @@ package ru.job4j.github.analysis.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.job4j.github.analysis.dto.RepositoryCommits;
+import ru.job4j.github.analysis.model.Commit;
 import ru.job4j.github.analysis.model.Repository;
 import ru.job4j.github.analysis.service.RepositoryService;
 
@@ -22,9 +22,8 @@ public class GitHubController {
     }
 
     @GetMapping("/commits/{name}")
-    public List<RepositoryCommits> getCommits(@PathVariable(value = "name") String name) {
-        Repository repository = this.repositoryService.findByName(name);
-        return this.repositoryService.findCommitsByRepositoryName(repository);
+    public List<Commit> getCommits(@PathVariable(value = "name") String name) {
+        return this.repositoryService.findCommitsByRepositoryName(name);
     }
 
     @PostMapping("/gitHub/{userName}")

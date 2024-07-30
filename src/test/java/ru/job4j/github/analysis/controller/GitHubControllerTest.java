@@ -9,11 +9,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.job4j.github.analysis.dto.RepositoryCommits;
+import ru.job4j.github.analysis.model.Commit;
 import ru.job4j.github.analysis.model.Repository;
 import ru.job4j.github.analysis.service.RepositoryService;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
+
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,12 +34,20 @@ class GitHubControllerTest {
 
     private Repository repository;
 
+    private Commit commit;
+
     @BeforeEach
     public void setUp() {
         this.repository = new Repository();
         this.repository.setName("test-repo");
         this.repository.setUrl("https://github.com/user/test-repo");
         this.repository.setUserName("user");
+
+        this.commit = new Commit();
+        this.commit.setMessage("Initial commit");
+        this.commit.setAuthor("user");
+        this.commit.setDate(LocalDateTime.now());
+        this.commit.setSha("abcd1234");
     }
 
     @Test
@@ -53,20 +63,18 @@ class GitHubControllerTest {
 
     @Test
     void testGetCommits() throws Exception {
-        RepositoryCommits commit = new RepositoryCommits("test-repo", "Initial commit", "user", LocalDateTime.now());
-        when(this.repositoryService.findByName("test-repo")).thenReturn(this.repository);
-        when(this.repositoryService.findCommitsByRepositoryName(this.repository)).thenReturn(Collections.singletonList(commit));
+        List<Commit> commits = Collections.singletonList(this.commit);
+        when(this.repositoryService.findCommitsByRepositoryName("test-repo")).thenReturn(commits);
 
         this.mockMvc.perform(get("/api/commits/test-repo")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("test-repo"))
                 .andExpect(jsonPath("$[0].message").value("Initial commit"))
                 .andExpect(jsonPath("$[0].author").value("user"))
-                .andExpect(jsonPath("$[0].date").exists());
+                .andExpect(jsonPath("$[0].date").exists())
+                .andExpect(jsonPath("$[0].sha").value("abcd1234"));
 
-        verify(this.repositoryService, times(1)).findByName("test-repo");
-        verify(this.repositoryService, times(1)).findCommitsByRepositoryName(this.repository);
+        verify(this.repositoryService, times(1)).findCommitsByRepositoryName("test-repo");
     }
 
     @Test
